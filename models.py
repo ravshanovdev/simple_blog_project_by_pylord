@@ -1,4 +1,4 @@
-from pylord.orm import Table, Column
+from pylord.orm import Table, Column, ForeignKey
 
 
 class Category(Table):
@@ -6,6 +6,7 @@ class Category(Table):
 
 
 class Blog(Table):
+    category = ForeignKey(Category)
     name = Column(str)
     description = Column(str)
     about = Column(str)
