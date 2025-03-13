@@ -53,4 +53,3 @@ def get_all_blogs(req, resp):
         "description": blog.description,
         "about": blog.about
     } for blog in blogs]
-
