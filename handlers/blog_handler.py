@@ -1,4 +1,4 @@
-from .category_handler import get_db
+from database import get_db
 from models.models import Blog, Category
 from pylord.app import PyLordApp
 
