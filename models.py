@@ -6,8 +6,9 @@ class Category(Table):
 
 
 class Blog(Table):
-    category = ForeignKey(Category)
     name = Column(str)
     description = Column(str)
     about = Column(str)
+    category = ForeignKey(Category)
+
 
