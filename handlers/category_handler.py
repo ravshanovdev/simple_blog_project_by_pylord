@@ -1,7 +1,7 @@
 from models.models import Category
 from pylord.app import PyLordApp
 from database import get_db
-
+from pylord.orm import ForeignKey
 app = PyLordApp()
 
 
@@ -9,23 +9,39 @@ def update_handler(req, resp, table, id):
     db = get_db()
 
     try:
-        # Ma'lumotlar bazasidan mavjud obyektni olish
+        # Obyektni olish
         instance = db.get(table, id=id)
+        if not instance:
+            resp.status_code = 404
+            resp.json = {"error": "Object not found"}
+            return
 
-        # Yangi qiymatlarni yangilash
+        annotations = getattr(table, "__annotations__", {})
+
         for key, value in req.json.items():
             if hasattr(instance, key):
-                setattr(instance, key, value)
+                # ForeignKey maydonlarni tekshirish va obyektga aylantirish
+                if key in annotations and isinstance(value, int):
+                    related_model = annotations[key]  # ForeignKey modeli
+                    related_instance = db.get(related_model, id=value)
+
+                    if not related_instance:
+                        resp.status_code = 400
+                        resp.json = {"error": f"{related_model.__name__} object with id {value} not found"}
+                        return
+
+                    setattr(instance, key, related_instance)
+                else:
+                    setattr(instance, key, value)
             else:
                 resp.status_code = 400
                 resp.json = {"error": f"Invalid field: {key}"}
                 return
 
-        # O'zgarishlarni saqlash
         db.update(instance)
 
         resp.status_code = 200
-        resp.json = {"message": "Updated successfully", "instance_id": instance.id, "instance_name": instance.name}
+        resp.json = {"message": "Updated successfully", "instance_id": instance.id}
 
     except Exception as e:
         resp.status_code = 500
