@@ -82,41 +82,44 @@ app.add_route("/get_blog/{id:d}", GetBlogById, allowed_methods=['get'])
 
 @app.route("/update_blog/{id:d}", allowed_methods=['patch'])
 def updateblog(req, resp, id):
-    db = get_db()
-    blog = db.get(Blog, id=id)
+    update_handler(req, resp, Blog, id=id)
 
-    if not blog:
-        resp.status_code = 404
-        resp.json = {"message": "blog not found"}
-        return
-
-    try:
-        required_fields = ["name", "description", "about"]
-        for field in required_fields:
-            if field not in req.json:
-                resp.status_code = 400
-                resp.json = {"error": f"'{field}' field is required"}
-                return
-
-        blog.name = req.json["name"]
-        blog.description = req.json["description"]
-        blog.about = req.json["about"]
-
-        if "category" in req.json and isinstance(req.json["category"], int):
-            category = db.get(Category, id=req.json["category"])
-            if not category:
-                resp.status_code = 400
-                resp.json = {"error": "category not found"}
-                return
-            blog.category = category
-
-        db.update(blog)
-        resp.status_code = 200
-        resp.json = {"message": "object was successfully updated"}
-
-    except Exception as e:
-        resp.status_code = 500
-        resp.json = {"error": str(e)}  # Xatoni logga olish mumkin
+    # update_handler() dan ham foydalanish mumkin yoki uzingiz qo'lda shunday yozishingiz ham mumkin
+    # db = get_db()
+    # blog = db.get(Blog, id=id)
+    #
+    # if not blog:
+    #     resp.status_code = 404
+    #     resp.json = {"message": "blog not found"}
+    #     return
+    #
+    # try:
+    #     required_fields = ["name", "description", "about"]
+    #     for field in required_fields:
+    #         if field not in req.json:
+    #             resp.status_code = 400
+    #             resp.json = {"error": f"'{field}' field is required"}
+    #             return
+    #
+    #     blog.name = req.json["name"]
+    #     blog.description = req.json["description"]
+    #     blog.about = req.json["about"]
+    #
+    #
+    #     category = db.get(Category, id=req.json["category"])
+    #     if not category:
+    #          resp.status_code = 404
+    #          resp.json = {"error": "category not found"}
+    #          return
+    #     blog.category = category
+    #
+    #     db.update(blog)
+    #     resp.status_code = 200
+    #     resp.json = {"message": "object was successfully updated"}
+    #
+    # except Exception as e:
+    #     resp.status_code = 500
+    #     resp.json = {"error": str(e)}
 
 
 

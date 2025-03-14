@@ -1,7 +1,6 @@
 from models.models import Category
 from pylord.app import PyLordApp
 from database import get_db
-from pylord.orm import ForeignKey
 app = PyLordApp()
 
 
@@ -9,25 +8,24 @@ def update_handler(req, resp, table, id):
     db = get_db()
 
     try:
-        # Obyektni olish
+
         instance = db.get(table, id=id)
         if not instance:
             resp.status_code = 404
             resp.json = {"error": "Object not found"}
             return
 
-        annotations = getattr(table, "__annotations__", {})
-
         for key, value in req.json.items():
             if hasattr(instance, key):
-                # ForeignKey maydonlarni tekshirish va obyektga aylantirish
-                if key in annotations and isinstance(value, int):
-                    related_model = annotations[key]  # ForeignKey modeli
-                    related_instance = db.get(related_model, id=value)
+                if isinstance(value, int):
+                    attr = getattr(table, key)
+                    foreignkey_table = attr.table
+
+                    related_instance = db.get(foreignkey_table, id=value)
 
                     if not related_instance:
                         resp.status_code = 400
-                        resp.json = {"error": f"{related_model.__name__} object with id {value} not found"}
+                        resp.json = {"error": f"{key.__name__} object with id {value} not found"}
                         return
 
                     setattr(instance, key, related_instance)
