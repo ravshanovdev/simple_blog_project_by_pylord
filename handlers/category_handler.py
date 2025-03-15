@@ -1,6 +1,7 @@
 from models.models import Category
 from pylord.app import PyLordApp
 from database import get_db
+from pylord.orm import ForeignKey
 app = PyLordApp()
 
 
@@ -17,14 +18,15 @@ def update_handler(req, resp, table, id):
 
         for key, value in req.json.items():
             if hasattr(instance, key):
-                if isinstance(value, int):
-                    attr = getattr(table, key)
+                attr = getattr(table, key)
+                if isinstance(attr, ForeignKey):
+
                     foreignkey_table = attr.table
 
                     related_instance = db.get(foreignkey_table, id=value)
 
                     if not related_instance:
-                        resp.status_code = 400
+                        resp.status_code = 404
                         resp.json = {"error": f"{key.__name__} object with id {value} not found"}
                         return
 
