@@ -122,7 +122,17 @@ def updateblog(req, resp, id):
     #     resp.json = {"error": str(e)}
 
 
+@app.route("/delete_blog/{id:d}", allowed_methods=['delete'])
+def delete_blog(req, resp, id):
+    db = get_db()
 
+    try:
+        blog = db.get(Blog, id=id)
+        if blog:
+            db.delete(Blog, id=id)
 
-
-
+            resp.status_code = 200
+            resp.json = {"message": "Blog Was Successfully Delete"}
+    except Exception as e:
+        resp.status_code = 404
+        resp.json = {"error": str(e)}
