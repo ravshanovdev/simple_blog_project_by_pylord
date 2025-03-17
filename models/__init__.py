@@ -1,3 +1,3 @@
-from .models import Category, Blog
+from .models import Category, Blog, User
 
 

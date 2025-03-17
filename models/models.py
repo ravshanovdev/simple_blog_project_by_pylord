@@ -12,3 +12,9 @@ class Blog(Table):
     category = ForeignKey(Category)
 
 
+class User(Table):
+    username = Column(str)
+    email = Column(str)
+    password_hash = Column(str)
+
+

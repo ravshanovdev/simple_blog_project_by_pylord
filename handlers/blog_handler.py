@@ -2,11 +2,12 @@ from database import get_db
 from models.models import Blog, Category
 from pylord.app import PyLordApp
 from .category_handler import update_handler
-
+from .secret_keys import auth_required
 app = PyLordApp()
 
 
 @app.route("/create_blog", allowed_methods=['post'])
+@auth_required
 def create_blog(req, resp):
     db = get_db()
     db.create(Blog)
@@ -136,3 +137,4 @@ def delete_blog(req, resp, id):
     except Exception as e:
         resp.status_code = 404
         resp.json = {"error": str(e)}
+
