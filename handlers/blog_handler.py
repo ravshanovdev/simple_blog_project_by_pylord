@@ -138,3 +138,23 @@ def delete_blog(req, resp, id):
         resp.status_code = 404
         resp.json = {"error": str(e)}
 
+
+@app.route("/get_blog_by_name/{names}", allowed_methods=['get'])
+def get_blog_by_name(req, resp, names: str):
+    db = get_db()
+
+    blog = db.get_by_field(Blog, field_name='name', value=names)
+
+    if blog is None:
+        resp.status_code = 404
+        resp.json = {"error": "blog not found!"}
+        return
+
+    resp.status_code = 200
+    resp.json = {
+        "id": blog.id,
+        "name": blog.name,
+        "description": blog.description,
+        "category": blog.category.name
+    }
+

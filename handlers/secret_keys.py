@@ -27,7 +27,7 @@ def auth_required(f):
         try:
             token = auth_header.split("Bearer ")[1]
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            req.user_id = payload["user_id"]
+            req.user_id = payload['user_id']
         except AttributeError:
             resp.status_code = 401
             resp.json = {"error": "Incorrect Token!"}

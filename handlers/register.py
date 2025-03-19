@@ -33,31 +33,37 @@ def user_register(req, resp):
         resp.status_code = 400
         resp.json = {"error": "password mos emas"}
 
-    existing_user = db.conn.execute("SELECT id FROM user WHERE username = ? OR email = ?",
-                                    (username, email)).fetchone()
+    # existing_user = db.conn.execute("SELECT id FROM user WHERE username = ? OR email = ?", (username, email)).fetchone()
+
+    existing_user = db.get_user(User, field_name='username', value=username)
+    existing_email = db.get_user(User, field_name='email', value=email)
 
     if existing_user:
         resp.status_code = 400
         resp.json = {"error": "user already exist"}
         return
+    elif existing_email:
+        resp.status_code = 400
+        resp.json = {"error": "Email already exist"}
+        return
+    else:
+        hashed_password = hash_password(data["password1"])
 
-    hashed_password = hash_password(data["password1"])
-
-    db.save(
-        User(
-            username=username,
-            email=email,
-            password_hash=hashed_password
+        db.save(
+            User(
+                username=username,
+                email=email,
+                password_hash=hashed_password
+            )
         )
-    )
 
-    resp.status_code = 201
-    resp.json = {
-        "username": username,
-        "email": email,
-        "password1": password1,
-        "password2": password2
-    }
+        resp.status_code = 201
+        resp.json = {
+            "username": username,
+            "email": email,
+            "password1": password1,
+            "password2": password2
+        }
 
 
 @app.route("/login", allowed_methods=['post'])
@@ -73,6 +79,7 @@ def login(req, resp):
         resp.json = {"message": "Username va password kiritish shart!"}
 
     user = db.conn.execute("SELECT id, password_hash FROM user WHERE username = ?", (username,)).fetchone()
+    # user = db.get_by_field(User, field_name='username', value=username)
 
     if not user or not check_password(password, user[1]):
         resp.status_code = 401
