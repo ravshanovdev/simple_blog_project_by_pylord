@@ -144,7 +144,8 @@ def get_blog_by_name(req, resp, names: str):
     db = get_db()
 
     blog = db.get_by_field(Blog, field_name='name', value=names)
-
+    # get_by_filed() ni takomlilashtirish kerak chogi chunki name bilan qidirganda agar nameda bosh joy(space) bolsa topa olmayapti.
+    # masalan: first post
     if blog is None:
         resp.status_code = 404
         resp.json = {"error": "blog not found!"}
