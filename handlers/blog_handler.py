@@ -1,7 +1,7 @@
 from database import get_db
 from models.models import Blog, Category
 from pylord.app import PyLordApp
-from .category_handler import update_handler
+from .dynamic_handlers import update_handler
 from .secret_keys import auth_required
 app = PyLordApp()
 
@@ -43,7 +43,7 @@ def get_all_blogs(req, resp):
 
     if not blogs:
         resp.status_code = 404
-        resp.json = {"message": "Blog Not Found"}
+        resp.json = {"message": "Not Any Blogs Found"}
         return
 
     resp.status_code = 200
@@ -84,43 +84,6 @@ app.add_route("/get_blog/{id:d}", GetBlogById, allowed_methods=['get'])
 @app.route("/update_blog/{id:d}", allowed_methods=['patch'])
 def updateblog(req, resp, id):
     update_handler(req, resp, Blog, id=id)
-
-    # update_handler() dan ham foydalanish mumkin yoki uzingiz qo'lda shunday yozishingiz ham mumkin
-    # db = get_db()
-    # blog = db.get(Blog, id=id)
-    #
-    # if not blog:
-    #     resp.status_code = 404
-    #     resp.json = {"message": "blog not found"}
-    #     return
-    #
-    # try:
-    #     required_fields = ["name", "description", "about"]
-    #     for field in required_fields:
-    #         if field not in req.json:
-    #             resp.status_code = 400
-    #             resp.json = {"error": f"'{field}' field is required"}
-    #             return
-    #
-    #     blog.name = req.json["name"]
-    #     blog.description = req.json["description"]
-    #     blog.about = req.json["about"]
-    #
-    #
-    #     category = db.get(Category, id=req.json["category"])
-    #     if not category:
-    #          resp.status_code = 404
-    #          resp.json = {"error": "category not found"}
-    #          return
-    #     blog.category = category
-    #
-    #     db.update(blog)
-    #     resp.status_code = 200
-    #     resp.json = {"message": "object was successfully updated"}
-    #
-    # except Exception as e:
-    #     resp.status_code = 500
-    #     resp.json = {"error": str(e)}
 
 
 @app.route("/delete_blog/{id:d}", allowed_methods=['delete'])

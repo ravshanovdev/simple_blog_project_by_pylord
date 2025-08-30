@@ -85,7 +85,7 @@ def login(req, resp):
         resp.status_code = 401
         resp.json = {"error": "Noto‘g‘ri username yoki parol!"}
 
-    token = generate_token(user[0])
+    token = generate_token(user[0], username=username)
 
     resp.status_code = 200
     resp.json = {"token": token}
