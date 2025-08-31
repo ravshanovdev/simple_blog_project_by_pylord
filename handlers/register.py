@@ -19,7 +19,9 @@ def check_password(password, hashed_password):
 def user_register(req, resp):
     db = get_db()
     db.create(User)
+
     data = req.json
+
     username = data.get("username")
     email = data.get("email")
     password1 = data.get("password1")
@@ -33,8 +35,6 @@ def user_register(req, resp):
         resp.status_code = 400
         resp.json = {"error": "password mos emas"}
 
-    # existing_user = db.conn.execute("SELECT id FROM user WHERE username = ? OR email = ?", (username, email)).fetchone()
-
     existing_user = db.get_user(User, field_name='username', value=username)
     existing_email = db.get_user(User, field_name='email', value=email)
 
@@ -47,7 +47,7 @@ def user_register(req, resp):
         resp.json = {"error": "Email already exist"}
         return
     else:
-        hashed_password = hash_password(data["password1"])
+        hashed_password = hash_password(password1)
 
         db.save(
             User(
@@ -89,3 +89,27 @@ def login(req, resp):
 
     resp.status_code = 200
     resp.json = {"token": token}
+
+
+@app.route("/get_all_users", allowed_methods=['get'])
+def get_all_users(req, resp):
+    db = get_db()
+
+    try:
+        users = db.all(User)
+        if not users:
+            resp.status_code = 404
+            resp.json = {"message": "not any user found.!"}
+            return
+
+    except Exception as e:
+        resp.status_code = 500
+        resp.json = {"error": str(e)}
+        return
+
+    resp.status_code = 200
+    resp.json = [
+        {"id": user.id, "username": user.username,
+         "hash_password": user.password_hash}
+        for user in users
+    ]

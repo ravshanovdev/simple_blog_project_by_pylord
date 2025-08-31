@@ -1,6 +1,7 @@
 from pylord.app import PyLordApp
 from database import get_db
 from pylord.orm import ForeignKey
+from models.models import User
 
 app = PyLordApp()
 
