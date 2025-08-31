@@ -3,14 +3,14 @@ import datetime
 import secrets
 from functools import wraps
 
-SECRET_KEY = secrets.token_hex(32)
+SECRET_KEY = "f3b8d966690de4d40b1f843216f2998ac66cbb2dff09b5717d25e617370deda5"
 
 
 def generate_token(user_id, username):
     payload = {
         "user_id": user_id,
         "username": username,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        "exp": datetime.datetime.utcnow() + datetime.timedelta(days=3)
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 

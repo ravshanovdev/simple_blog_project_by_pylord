@@ -3,6 +3,7 @@ from pylord.app import PyLordApp
 from database import get_db
 from .secret_keys import auth_required
 from .dynamic_handlers import update_handler
+from models.models import User
 app = PyLordApp()
 
 
@@ -11,7 +12,11 @@ app = PyLordApp()
 def create_category(req, resp):
     db = get_db()
     db.create(Category)
+
     category = Category(**req.POST)
+
+    user = db.get(User, id=req.user_id)
+    category.user = user
     db.save(category)
 
     resp.status_code = 201
@@ -43,6 +48,7 @@ def get_category_by_id(req, resp, id):
 
 
 @app.route("/delete_category/{id:d}", allowed_methods=["delete"])
+@auth_required
 def delete_category_by_id(req, resp, id):
     db = get_db()
 
@@ -60,5 +66,6 @@ def delete_category_by_id(req, resp, id):
 
 
 @app.route("/update_category/{id:d}", allowed_methods=['patch'])
+@auth_required
 def update_category_by_id(req, resp, id):
     update_handler(req, resp, Category, id)

@@ -1,6 +1,7 @@
 from pylord.app import PyLordApp
 from database import get_db
 from pylord.orm import ForeignKey
+
 app = PyLordApp()
 
 
@@ -8,11 +9,17 @@ def update_handler(req, resp, table, id):
     db = get_db()
 
     try:
+        try:
+            instance = db.get(table, id=id)
+        except Exception:
 
-        instance = db.get(table, id=id)
-        if not instance:
             resp.status_code = 404
-            resp.json = {"error": "Object not found"}
+            resp.json = {"error": f"{table.__name__} with id {id} not found"}
+            return
+
+        if hasattr(table, "user") and instance.user.id != req.user_id:
+            resp.status_code = 403
+            resp.json = {"error": "you can't update this instance.!"}
             return
 
         for key, value in req.json.items():

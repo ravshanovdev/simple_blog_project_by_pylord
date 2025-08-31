@@ -1,6 +1,7 @@
 venv/
 # Python cache files
 /__pycache__/
+*.pyc
 *.py[cod]
 *$py.class
 .idea/
